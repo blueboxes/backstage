@@ -13,8 +13,10 @@ import { GroupEntity } from '@backstage/catalog-model';
 import { JsonValue } from '@backstage/types';
 import { LocationSpec } from '@backstage/plugin-catalog-backend';
 import { Logger as Logger_2 } from 'winston';
+import { PluginTaskScheduler } from '@backstage/backend-tasks';
 import { SearchEntry } from 'ldapjs';
 import { SearchOptions } from 'ldapjs';
+import { TaskDefinition } from '@backstage/backend-tasks';
 import { UserEntity } from '@backstage/catalog-model';
 
 // @public
@@ -106,17 +108,25 @@ export class LdapOrgEntityProvider implements EntityProvider {
   // (undocumented)
   static fromConfig(
     configRoot: Config,
-    options: {
-      id: string;
-      target: string;
-      userTransformer?: UserTransformer;
-      groupTransformer?: GroupTransformer;
-      logger: Logger_2;
-    },
+    options: LdapOrgEntityProviderOptions,
   ): LdapOrgEntityProvider;
   // (undocumented)
   getProviderName(): string;
   read(): Promise<void>;
+}
+
+// @public
+export interface LdapOrgEntityProviderOptions {
+  groupTransformer?: GroupTransformer;
+  id: string;
+  logger: Logger_2;
+  schedule:
+    | 'manual'
+    | (Pick<TaskDefinition, 'initialDelay' | 'frequency' | 'timeout'> & {
+        scheduler: PluginTaskScheduler;
+      });
+  target: string;
+  userTransformer?: UserTransformer;
 }
 
 // @public
