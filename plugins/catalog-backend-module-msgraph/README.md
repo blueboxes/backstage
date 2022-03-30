@@ -124,13 +124,20 @@ yarn add @backstage/plugin-catalog-backend-module-msgraph
 4. The `MicrosoftGraphOrgReaderProcessor` is not registered by default, so you
    have to register it in the catalog plugin:
 
-```typescript
+```diff
 // packages/backend/src/plugins/catalog.ts
-builder.addProcessor(
-  MicrosoftGraphOrgReaderProcessor.fromConfig(env.config, {
-    logger: env.logger,
-  }),
-);
++import { MicrosoftGraphOrgReaderProcessor } from '@backstage/plugin-catalog-backend-module-msgraph';
+
+ export default async function createPlugin(
+   env: PluginEnvironment,
+ ): Promise<Router> {
+   const builder = await CatalogBuilder.create(env);
+   
++ builder.addProcessor(
++   MicrosoftGraphOrgReaderProcessor.fromConfig(env.config, {
++    logger: env.logger,
++  }),
++ );
 ```
 
 5. Add a location that ingests from Microsoft Graph:
@@ -155,6 +162,10 @@ groups and the organization.
 1. Create a transformer:
 
 ```ts
+import { defaultGroupTransformer } from '@backstage/plugin-catalog-backend-module-msgraph';
+import * as MicrosoftGraph from '@microsoft/microsoft-graph-types';
+import { GroupEntity } from '@backstage/catalog-model';
+
 export async function myGroupTransformer(
   group: MicrosoftGraph.Group,
   groupPhoto?: string,
